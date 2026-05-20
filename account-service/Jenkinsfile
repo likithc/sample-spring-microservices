@@ -19,22 +19,23 @@ node {
 
         stage('Image') {
             dir ('account-service') {
-                def app = docker.build "likithc/account-service:${env.version}"
-             withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'likithc', passwordVariable: 'Djsnake@12')])
-             {
-              sh 'echo "Djsnake@12" | docker login -u "likithc" --password-stdin'
+                def app = docker.build "localhost:5000/account-service:${env.version}"
                 app.push()
-              app.push('latest')}
             }
         }
 
         stage ('Run') {
-            docker.image("likithc/account-service:${env.version}").run('-p 2222:2222 -h account --name account --link discovery')
+            docker.image("localhost:5000/account-service:${env.version}").run('-p 2222:2222 -h account --name account --link discovery')
         }
 
         stage ('Final') {
             build job: 'customer-service-pipeline', wait: false
         }      
+
+    }
+
+}
+
 
     }
 
